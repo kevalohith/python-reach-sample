@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.ui.deploymentName }}
+  labels:
+    app: {{ .Values.ui.label }}
+spec:
+  replicas: {{ .Values.ui.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.ui.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ui.label }}
+    spec:
+      containers:
+      - name: {{ .Values.ui.deploymentName }}
+        image: {{ .Values.ui.image.registry }}/{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}
+        env:
+          - name: REACT_APP_BACKEND_SERVER
+            value: "http://aaa9a54c551e447eb8f582c2de945f5a-1727205722.ap-south-1.elb.amazonaws.com/api/"  
+        ports:
+        - containerPort: {{ .Values.ui.port }}
