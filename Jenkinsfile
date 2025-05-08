@@ -52,7 +52,7 @@ pipeline {
                     helm package api-ui -d .
 
                     echo "Pushing Helm chart to JFrog..."
-                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-*.tgz ${HELM_REPO_URL}/api-ui-helm-local${BUILD_NUMBER}.tgz
+                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-*.tgz ${HELM_REPO_URL}/api-ui-helm-local-${BUILD_NUMBER}.tgz
                 '''
             }
         } 
@@ -67,27 +67,11 @@ pipeline {
                     sudo helm repo update
                     
                     echo "Upgrading Helm release with new image tags..."
-                    sudo helm upgrade api-ui api-ui/ \
+                    sudo helm upgrade api-ui api-ui/api-ui --version ${BUILD_NUMBER} \
                       --install \
                       --namespace default \
                       --set ui.image.tag=${BUILD_NUMBER} \
                       --set api.image.tag=${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        stage('Package & Push Helm Charts') {
-            agent {
-                label 'K8Master'
-            }
-            steps {
-                sh '''
-                    sudo su -
-                    echo "Packaging Helm chart..."
-                    helm package api-ui -d .
-
-                    echo "Pushing Helm chart to JFrog..."
-                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-*.tgz ${HELM_REPO_URL}/api-ui-helm-local${BUILD_NUMBER}.tgz
                 '''
             }
         }
