@@ -44,6 +44,18 @@ pipeline {
                 '''
             }
         }
+        stage('Package & Push Helm Charts') {
+            steps {
+                sh '''
+                    sudo su -
+                    echo "Packaging Helm chart..."
+                    helm package api-ui -d .
+
+                    echo "Pushing Helm chart to JFrog..."
+                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-*.tgz ${HELM_REPO_URL}/api-ui-helm-local${BUILD_NUMBER}.tgz
+                '''
+            }
+        } 
 
         stage('Deploy via Helm') {
             agent {
@@ -51,9 +63,11 @@ pipeline {
             }
             steps {
                 sh '''
-                    sudo su -
+                    sudo helm repo add api-ui ${HELM_REPO_URL}
+                    sudo helm repo update
+                    
                     echo "Upgrading Helm release with new image tags..."
-                    helm upgrade api-ui ./api-ui \
+                    sudo helm upgrade api-ui api-ui/ \
                       --install \
                       --namespace default \
                       --set ui.image.tag=${BUILD_NUMBER} \
