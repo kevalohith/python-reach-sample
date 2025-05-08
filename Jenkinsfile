@@ -47,12 +47,11 @@ pipeline {
         stage('Package & Push Helm Charts') {
             steps {
                 sh '''
-                    sudo su -
                     echo "Packaging Helm chart..."
-                    helm package api-ui -d .
+                    sudo helm package api-ui --version ${BUILD_NUMBER}
 
                     echo "Pushing Helm chart to JFrog..."
-                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-*.tgz ${HELM_REPO_URL}/api-ui-helm-local-${BUILD_NUMBER}.tgz
+                    curl -u "$JFROG_USER:$JFROG_PASSWORD" -T api-ui-${BUILD_NUMBER}.tgz ${HELM_REPO_URL}/api-ui-${BUILD_NUMBER}.tgz
                 '''
             }
         } 
