@@ -62,7 +62,7 @@ pipeline {
             }
             steps {
                 sh '''
-                    sudo helm repo add api-ui ${HELM_REPO_URL}
+                    sudo helm repo add api-ui ${HELM_REPO_URL} --username ${JFROG_USER} --password ${JFROG_PASSWORD}
                     sudo helm repo update
                     
                     echo "Upgrading Helm release with new image tags..."
